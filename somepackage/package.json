@@ -1,0 +1,13 @@
+{
+	"main": "./lib/interface.js",
+	"name": "XLW_NodeJs_Test",
+	"description": "我的nodejs测试",
+	"version": "0.1",
+	"keyword": ["nodejs"],
+	"maintainers": [{"name": "xlw", "email": "xlw@qq.com", "web": "www.baidu.com"}],
+	"contributors": [{"name": "xlw", "email": "xlw@qq.com", "web": "www.baidu.com"}],
+	"bugs": "www.baidu.com",
+	"licenses": [{"type": "xlw", "url": "www.baidu.com"}],
+	"repositories": [{"type": "xlw", "url": "www.baidu.com", "path": "xlw"}],
+	"dependencies": {"webkit": "1.2","ssl": {"gnutls": ["1.0", "2.0"],"openssl": "0.9.8"}}
+}
