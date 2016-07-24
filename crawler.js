@@ -4,23 +4,23 @@
 var http = require('http');
 var cheerio = require('cheerio');
 var url = 'http://www.imooc.com/learn/348';
+var fs = require('fs');
 
 function filterChapter(html) {
     var $ = cheerio.load(html);
-    var chapters = $('.learnchapter');
+    var chapters = $('.chapter');
     var courseData = [];
-    chapters.each(function (item) {
+    chapters.each(function () {
         var chapter = $(this);
         var chapterTitle = chapter.find('strong').text();
-        var videos = chapter.find('.vodio').children('li');
+        var videos = chapter.find('.video').children('li');
         var chapterData = {
-            chaperTitle: chapterTitle,
+            chapterTitle: chapterTitle,
             videos: []
         };
 
-        videos.each(function (item) {
+        videos.each(function () {
             var video = $(this).find('.studyvideo');
-            ;
             var videoTitle = video.text();
             var id = video.attr('href').split('video/')[1];
             chapterData.videos.push({
@@ -41,9 +41,9 @@ function printCourseDataInfo(courseData) {
         console.log(chapterTitle + '\n');
 
         item.videos.forEach(function (video) {
-            console.log('  【' + video.id + '】' + video.title + '\n');
-        })
-    })
+            console.log('  【' + video.id + '】' + video.title );
+        });
+    });
 }
 
 http.get(url, function (res) {
@@ -54,6 +54,11 @@ http.get(url, function (res) {
     });
 
     res.on('end', function () {
+        fs.writeFile('index.htm', html, 'utf8', function (err) {
+            if (err) {
+                return console.log(err.message);
+            }
+        })
         var courseData = filterChapter(html);
 
         printCourseDataInfo(courseData);
