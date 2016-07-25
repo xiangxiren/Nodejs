@@ -46,14 +46,18 @@ var renderHtml = function (req, res) {
     if (page > fileArr.length)page = fileArr.length;
 
     let files = fileArr[page - 1];
-    let html = '<div class="row-fluid">';
-    for (let i = 0, count = files.length; i < count; i++) {
-        if (i > 0 && i % 4 === 0) {
-            html += `</div>
+    let html = '';
+    let pageHtml='';
+
+    if (fileArr.length > 0) {
+        html = '<div class="row-fluid">';
+        for (let i = 0, count = files.length; i < count; i++) {
+            if (i > 0 && i % 4 === 0) {
+                html += `</div>
                      <div class="space10"></div>
                      <div class="row-fluid">`;
-        }
-        html += `
+            }
+            html += `
                     <div class="span3">
                         <div class="item">
                             <a class="fancybox-button" data-rel="fancybox-button" title="Photo" href="imgFile/${files[i]}">
@@ -64,16 +68,17 @@ var renderHtml = function (req, res) {
                             </a>
                         </div>
                     </div>`;
-    }
-    html += `</div>
+        }
+        html += `</div>
                    <div class="space10"></div>`;
 
-    var pageHtml = '';
-    for (let i = 1; i <= fileArr.length; i++) {
-        pageHtml += `<li><a href="/${i}">${i}</a></li>`;
+        pageHtml = '';
+        for (let i = 1; i <= fileArr.length; i++) {
+            pageHtml += `<li><a href="/${i}">${i}</a></li>`;
+        }
+        if (page > 1)pageHtml = '<li><a href="/1">«</a></li>' + pageHtml;
+        if (page < fileArr.length)pageHtml += `<li><a href="/${fileArr.length}">»</a></li>`;
     }
-    if (page > 1)pageHtml = '<li><a href="/1">«</a></li>' + pageHtml;
-    if (page < fileArr.length)pageHtml += `<li><a href="/${fileArr.length}">»</a></li>`;
 
     fs.readFile(path.join(__dirname, 'index.html'), function (err, data) {
         if (err) {

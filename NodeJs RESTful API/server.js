@@ -44,7 +44,7 @@ app.get('/addUser', function (req, res) {
                 }
                 console.log(data);
                 res.end(JSON.stringify(data));
-            })
+            });
         });
     });
 });
@@ -81,10 +81,9 @@ app.get('/deleteUser/:id', function (req, res) {
                 }
                 console.log(data);
                 res.end(JSON.stringify(data));
-            })
-        })
-    })
-
+            });
+        });
+    });
 });
 
 var server = app.listen(8081, function () {
