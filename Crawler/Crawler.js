@@ -30,12 +30,16 @@ function getContent(callback) {
     }
 }
 
-function getImgeFile(fileName) {
-    var writestream = fs.createWriteStream(path.join(__dirname, 'image', fileName));
+function getImgeFile(fileName, dir) {
+    if (!fs.existsSync(path.join(__dirname, dir))) {
+        fs.mkdirSync(path.join(__dirname, dir))
+    }
+    var writestream = fs.createWriteStream(path.join(__dirname, dir, fileName));
     http.get(url, function (res) {
         res.pipe(writestream);
     });
     writestream.on('finish', function () {
+         console.log(`${fileName}写入成功！`);
     });
 }
 
@@ -56,7 +60,7 @@ function extractFile(html, regex, dir, {sourceStr, replaceStr} = {}, getCallBack
                 html = html.replace(str, `${dir}/${fileName}`);
             url = domain + str;
             if (regex === imgRegex || regex === cssImgRegex || regex === swfRegex) {
-                getImgeFile(fileName);
+                getImgeFile(fileName, 'image');
             }
             else {
                 getContent(function (fileContent) {
@@ -66,8 +70,12 @@ function extractFile(html, regex, dir, {sourceStr, replaceStr} = {}, getCallBack
                             fileContent = fileContent.replace(new RegExp(sourceStr[i], 'gm'), replaceStr);
                     }
                     let filePath = path.join(__dirname, dir, fileName);
+                    if (!fs.existsSync(path.join(__dirname, dir))) {
+                        fs.mkdirSync(path.join(__dirname, dir))
+                    }
                     fs.writeFile(filePath, fileContent, 'utf8', function (err) {
                         if (err)return console.log(err.message);
+                        else console.log(`${filePath}写入成功！`);
                     });
                 });
             }
@@ -111,6 +119,7 @@ function extractSwfFile(html) {
     extractFile(html, swfRegex, 'image', {}, null, function (html) {
         fs.writeFile(path.join(__dirname, 'test.html'), html, 'utf8', function (err) {
             if (err)return console.log(err.message);
+            console.log('爬取完成')
         });
     })
 }
