@@ -7,11 +7,38 @@ let path = require('path');
 
 let domain = 'http://www.chengdu.gov.cn';
 let url = 'http://www.chengdu.gov.cn/servicelist/jzz01/';
+let jsonUrl = '/portals/information/findInformationById.json?id=74e82a40c4e7472aa0a106f93767163d';
 let cssRegex = /<link.*?href="(\/html.*?)"/g;
 let jsRegex = /<script.*?src="(\/html.*?)"/g;
 let imgRegex = /<img.*?src="(\/html.*?)"/g;
 let cssImgRegex = /url\((.*?)\)/g;
 let swfRegex = /<param.*?value="(.*?.swf)"/g;
+
+function getJsondata(callback, param) {
+    http.get(domain + jsonUrl, function (res) {
+        res.setEncoding('utf8');
+        let content = '';
+        res.on('data', function (data) {
+            content += data;
+        });
+        res.on('end', function () {
+            let dir = path.join(__dirname, 'json');
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir)
+            }
+            let xlsImg = '/com.wisesoft.bcp.web/static/js/ueditor-1.4.3.1/dialogs/attachment/fileTypeImages/icon_xls.gif';
+            url = domain + xlsImg;
+            content = content.replace(xlsImg, 'image/icon_xls.gif');
+            getImgeFile('icon_xls.gif', 'image');
+            fs.writeFile(path.join(__dirname, 'json', 'content.json'), content, function (err) {
+                if (err)return console.log(err);
+            });
+        });
+    });
+
+    if (typeof callback === "function")
+        callback(param);
+}
 
 function getContent(callback) {
     if (typeof callback === "function") {
@@ -22,6 +49,7 @@ function getContent(callback) {
                 html += data;
             });
             res.on('end', function () {
+                html = html.replace("portals", "Nodejs/Crawler").replace("information/findInformationById", "json/content");
                 callback(html);
             });
         }).on('error', function () {
@@ -39,7 +67,7 @@ function getImgeFile(fileName, dir) {
         res.pipe(writestream);
     });
     writestream.on('finish', function () {
-         console.log(`${fileName}写入成功！`);
+        console.log(`${fileName}写入成功！`);
     });
 }
 
@@ -116,13 +144,18 @@ function extractImageFile(html) {
  * 提取swf
  * */
 function extractSwfFile(html) {
-    extractFile(html, swfRegex, 'image', {}, null, function (html) {
-        fs.writeFile(path.join(__dirname, 'test.html'), html, 'utf8', function (err) {
-            if (err)return console.log(err.message);
-            console.log('爬取完成')
-        });
-    })
+    extractFile(html, swfRegex, 'image', {}, null, writeHtmlFile);
 }
 
+function writeHtmlFile(html) {
+    fs.writeFile(path.join(__dirname, 'test.html'), html, 'utf8', function (err) {
+        if (err)return console.log(err.message);
+        console.log('爬取完成')
+    });
+}
 
-getContent(extractCssFile);
+function Run() {
+    getJsondata(getContent, extractCssFile);
+}
+
+exports.run = Run;
