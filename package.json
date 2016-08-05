@@ -2,10 +2,12 @@
   "name": "application-name",
   "version": "0.0.1",
   "dependencies": {
+    "bluebird": "^3.4.1",
     "body-parser": "^1.15.2",
     "cheerio": "^0.20.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
-    "multer": "^1.1.0"
+    "multer": "^1.1.0",
+    "promise": "^7.1.1"
   }
 }
