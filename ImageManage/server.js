@@ -8,26 +8,29 @@ let path = require('path');
 let app = express();
 let fileArr = [];
 
-fs.readdir(path.join(__dirname, 'public/imgFile'), function (err, files) {
-    if (err) {
-        return console.log(err.message);
-    }
-
-    let page = [];
-    for (let i = 0, count = files.length; i < count; i++) {
-        if (i % 12 === 0 && page.length > 0) {
-            fileArr.push(page);
-            page = [];
-        }
-        page.push(files[i]);
-    }
-    if (page.length > 0)fileArr.push(page);
-});
-
 app.use(express.static('public'));
 app.get('/', function (req, res) {
     renderHtml(req, res);
 });
+
+var readfile = function () {
+    fileArr.length = 0;
+    fs.readdir(path.join(__dirname, 'public/imgFile'), function (err, files) {
+        if (err) {
+            return console.log(err.message);
+        }
+
+        let page = [];
+        for (let i = 0, count = files.length; i < count; i++) {
+            if (i % 12 === 0 && page.length > 0) {
+                fileArr.push(page);
+                page = [];
+            }
+            page.push(files[i]);
+        }
+        if (page.length > 0)fileArr.push(page);
+    });
+}
 
 app.get('/:page', function (req, res) {
     renderHtml(req, res);
@@ -35,7 +38,7 @@ app.get('/:page', function (req, res) {
 
 app.post('/')
 
-var server = app.listen(80, function () {
+var server = app.listen(8888, function () {
     let host = server.address().address;
     let port = server.address().port;
     console.log("应用实例，访问地址为 http://%s:%s", host, port)
@@ -47,7 +50,7 @@ var renderHtml = function (req, res) {
 
     let files = fileArr[page - 1];
     let html = '';
-    let pageHtml='';
+    let pageHtml = '';
 
     if (fileArr.length > 0) {
         html = '<div class="row-fluid">';
@@ -89,3 +92,5 @@ var renderHtml = function (req, res) {
         }
     });
 }
+
+setInterval(readfile, 5000);
