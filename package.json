@@ -8,6 +8,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "multer": "^1.1.0",
-    "promise": "^7.1.1"
+    "promise": "^7.1.1",
+    "request": "^2.74.0"
   }
 }
