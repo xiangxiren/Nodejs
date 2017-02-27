@@ -12,7 +12,7 @@ function filterChapter(html) {
     var courseData = [];
     chapters.each(function () {
         var chapter = $(this);
-        var chapterTitle = chapter.find('strong').text();
+        var chapterTitle = chapter.find('strong').text().trim().replace(/\s+/g, '');
         var videos = chapter.find('.video').children('li');
         var chapterData = {
             chapterTitle: chapterTitle,
@@ -20,9 +20,9 @@ function filterChapter(html) {
         };
 
         videos.each(function () {
-            var video = $(this).find('.studyvideo');
-            var videoTitle = video.text();
-            var id = video.attr('href').split('video/')[1];
+            var video = $(this).find('.J-media-item');
+            var videoTitle = video.text().trim().replace(/\s+/g, '');
+            var id = video.attr('href').trim().replace(/\s+/g, '');
             chapterData.videos.push({
                 title: videoTitle,
                 id: id
