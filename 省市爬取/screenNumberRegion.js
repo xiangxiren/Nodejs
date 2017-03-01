@@ -7,17 +7,17 @@ const linereader = require('line-reader');
 const numberSegmentByLocal = 'numberSegmentByLocal.txt';
 
 function readNumberRegion() {
-    linereader.eachLine(numberSegmentByLocal, function (line) {
+    linereader.eachLine(numberSegmentByLocal, function (line, last) {
         let arr = line.toString().split(' ');
         let segment = arr[1];
         let province = arr[2];
         let city = arr[3];
-        let path = `${province}/${city}/${numberSegmentByLocal}`;
         createProvince(province, function () {
-            createCity(province, city, function () {
-                appendFile(segment, arr + '\r\n', path);
-            })
+            appendFile(segment, arr + '\r\n', `${province}/${city}.txt`);
         });
+        if (last) {
+            console.log('分类完成');
+        }
     });
 }
 
@@ -36,22 +36,6 @@ function createProvince(province, callback) {
     });
 }
 
-function createCity(province, city, callback) {
-    let path = `${province}/${city}`;
-
-    fs.exists(path, function (isExist) {
-        if (!isExist) {
-            fs.mkdir(path, function (err) {
-                if (err)
-                    createCity(province, city, callback)
-                else
-                    executeCallBack(callback);
-            })
-        } else
-            executeCallBack(callback);
-    });
-}
-
 function appendFile(key, content, path) {
     fs.appendFile(path, content, 'utf8', function (err) {
         if (err) {
@@ -66,6 +50,5 @@ function executeCallBack(callback) {
     if (typeof callback === 'function')
         callback();
 }
-
 
 exports.run = readNumberRegion;
