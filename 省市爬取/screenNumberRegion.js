@@ -52,3 +52,17 @@ function executeCallBack(callback) {
 }
 
 exports.run = readNumberRegion;
+
+/*
+*
+ 181 中国电信
+ 184 中国移动
+ 185 中国联通
+ 176 中国联通
+ 177 中国电信
+ 178 中国移动
+
+ 145 中国联通
+*
+*
+* */
