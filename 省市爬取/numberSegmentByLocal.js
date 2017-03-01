@@ -8,11 +8,15 @@ const https = require('https');
 const iconv = require('iconv-lite');
 
 const addressUrl = 'https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?co=&resource_id=6004&t=1488245447067&ie=utf8&oe=gbk&cb=op_aladdin_callback&format=json&tn=baidu&cb=jQuery110202676949236702635_1488245429796&_=1488245429798&query=';
+const numberSegmentByLocal = 'numberSegmentByLocal.txt';
 
 let length;
-let buf = new Buffer(12000000);
 var numberRegion = [];
 
+/*
+ * https的get请求
+ * 参数：url（请求地址）,success（请求成功回调）
+ * */
 function httpsGet(url, success) {
     https.get(url, function (res) {
         if (typeof success === "function")
@@ -23,8 +27,11 @@ function httpsGet(url, success) {
     });
 }
 
+/*
+ * 读取phoneNumber.txt调用百度接口
+ * */
 function readNumberRegion() {
-    linereader.eachLine('phoneNumber.txt', function (line, last) {
+    linereader.eachLine('phoneNumber.txt', function (line) {
         let arr = line.toString().split('	');
         let number = arr[0] + '6560';
         console.log(number);
@@ -43,33 +50,34 @@ function readNumberRegion() {
                 let dataStr = result.substr(index + 1, result.length - index - 3);
                 let dataJson = JSON.parse(dataStr);
                 let data = dataJson.data[0];
-                numberRegion.push({
-                    key: data.key.substr(0, 3),
-                    segment: data.key,
-                    prov: data.prov,
-                    city: data.city,
-                    type: data.type
-                });
+                data.prov = !!data.prov ? data.prov : data.city;
+                let txtContent = `${data.key.substr(0, 3)} ${data.key} ${data.prov} ${data.city} ${data.type}\r\n`;
+                appendFile(data.key, txtContent, numberSegmentByLocal);
             });
         });
+    });
+}
 
-        if (last) {
-            numberRegion = numberRegion.sort(function (first, second) {
-                return first.segment - second.segment;
-            });
-            fs.writeFile('numberSegmentByLocal.json', JSON.stringify(numberRegion), 'utf8', function (err) {
-                if (err) {
-                    return console.log(err.message);
-                }else   {
-                    console.log('数据写入成功');
-                }
-            });
+/*
+ * 将文本追加写入到numberSegmentByLocal.txt中
+ * 参数：key（号段），content（写入的内容）
+ * */
+function appendFile(key, content, fileName) {
+    fs.appendFile(fileName, content, 'utf8', function (err) {
+        if (err) {
+            appendFile(key, content, fileName);
+        } else {
+            console.log(`${key}数据写入成功`);
         }
     });
 }
 
 function Run() {
-    readNumberRegion();
+    fs.exists(numberSegmentByLocal, function (isExist) {
+        if (isExist) {
+            fs.unlink(numberSegmentByLocal, readNumberRegion)
+        }
+    });
 }
 
 exports.run = Run;
