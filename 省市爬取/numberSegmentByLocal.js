@@ -11,9 +11,6 @@ const addressUrl = 'https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?co=&r
 const numberSegmentByLocal = 'numberSegmentByLocal.txt';
 const numberSegmentByLocalNone = 'numberSegmentByLocalNone.txt';
 
-let length;
-var numberRegion = [];
-
 /*
  * https的get请求
  * 参数：url（请求地址）,success（请求成功回调）
@@ -110,55 +107,6 @@ function readNumberRegionEx() {
     });
 }
 
-/*
- * filterNumber.txt调用百度接口
- * */
-function readNumberRegionExEx() {
-    let keys =[185] //[176, 177, 178, 181, 184, 185];
-    for (key of keys) {
-        for (let num = 0; num <= 9999; num++) {
-            let str = num.toString();
-            switch (str.length) {
-                case 1:
-                    str = "000" + str;
-                    break;
-                case 2:
-                    str = "00" + str;
-                    break;
-                case 3:
-                    str = "0" + str;
-                    break;
-            }
-            console.log(key + str + "6560");
-            httpsGet(addressUrl + key + str + "6560", function (res) {
-                let datas = [];
-                let size = 0;
-                res.on('data', function (data) {
-                    datas.push(data);
-                    size += data.length;
-                });
-                res.on("end", function () {
-                    let buff = Buffer.concat(datas, size);
-                    let result = iconv.decode(buff, "gb2312");//转码//var result = buff.toString();//不需要转编码,直接tostring
-                    let index = result.indexOf('(');
-                    let dataStr = result.substr(index + 1, result.length - index - 3);
-                    let dataJson = JSON.parse(dataStr);
-                    if (dataJson.status === '0') {
-                        if (dataJson.data.length === 0) {
-                            appendFile(key, key + str + '\r\n', numberSegmentByLocalNone);
-                        } else {
-                            let data = dataJson.data[0];
-                            data.prov = !!data.prov ? data.prov : data.city;
-                            let txtContent = `${key} ${key.toString() + str} ${data.prov} ${data.city} ${data.type}\r\n`;
-                            appendFile(data.key, txtContent, numberSegmentByLocal);
-                        }
-                    }
-                });
-            });
-        }
-    }
-}
-
 function Run() {
     //fs.exists(numberSegmentByLocal, function (isExist) {
     //    if (isExist) {
@@ -166,13 +114,13 @@ function Run() {
     //    }
     //});
 
-    //fs.exists(numberSegmentByLocalNone, function (isExist) {
-    //    if (isExist) {
-    //        fs.unlink(numberSegmentByLocalNone, readNumberRegionEx)
-    //    }
-    //});
-
-    readNumberRegionExEx();
+    fs.exists(numberSegmentByLocalNone, function (isExist) {
+       if (isExist) {
+           fs.unlink(numberSegmentByLocalNone, readNumberRegionEx)
+       }else{
+           readNumberRegionEx();
+       }
+    });
 }
 
 exports.run = Run;

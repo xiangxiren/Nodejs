@@ -14,4 +14,4 @@ var screenNumberRegion = require('./screenNumberRegion.js');
 //provinceCityCrawler.run();
 //numberSegmentByTiaoHao.run();
 numberSegmentByLocal.run();
-screenNumberRegion.run();
+// screenNumberRegion.run();
