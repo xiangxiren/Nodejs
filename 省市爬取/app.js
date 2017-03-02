@@ -8,5 +8,5 @@ var screenNumberRegion = require('./screenNumberRegion.js');
 
 //provinceCityCrawler.run();
 //numberSegmentByTiaoHao.run();
-//numberSegmentByLocal.run();
+numberSegmentByLocal.run();
 screenNumberRegion.run();
